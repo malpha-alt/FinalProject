@@ -2,9 +2,9 @@ const BASE_URL = "https://pokeapi.co/api/v2";
 
 export async function fetchPokemonByName(name: string): Promise<any> {
   try {
-    const response = await fetch(${BASE_URL}/pokemon/${name.toLowerCase()});
+    const response = await fetch(`${BASE_URL}/pokemon/${name.toLowerCase()}`);
     if (!response.ok) {
-      throw new Error(Failed to fetch Pokémon: ${response.statusText});
+      throw new Error(`Failed to fetch Pokémon: ${response.statusText}`);
     }
     return await response.json();
   } catch (error) {
@@ -13,12 +13,11 @@ export async function fetchPokemonByName(name: string): Promise<any> {
   }
 }
 
-
 export async function fetchRandomPokemons(count: number): Promise<any[]> {
   try {
-    const response = await fetch(${BASE_URL}/pokemon?limit=1000);
+    const response = await fetch(`${BASE_URL}/pokemon?limit=1000`);
     if (!response.ok) {
-      throw new Error(Failed to fetch Pokémon list: ${response.statusText});
+      throw new Error(`Failed to fetch Pokémon list: ${response.statusText}`);
     }
     const data = await response.json();
     const allPokemons = data.results;
