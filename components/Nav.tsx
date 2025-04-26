@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from "react";
+import Link from "next/link"; // Importing Link from next/link
 import { FiMenu, FiX } from "react-icons/fi"; // Importing icons from react-icons
 
 /**
@@ -9,7 +10,7 @@ import { FiMenu, FiX } from "react-icons/fi"; // Importing icons from react-icon
  * This component renders a responsive navigation bar for the Pokémon app.
  * It includes:
  * - A logo displayed on the left.
- * - Navigation links (Home, Pokedex, About) dynamically rendered from an array.
+ * - Navigation links (Home, Pokedex) dynamically rendered from an array.
  * - A toggleable mobile menu using React state.
  * - React Icons (FiMenu and FiX) for the mobile menu button.
  *
@@ -19,9 +20,8 @@ const Nav = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const navLinks = [
-    { name: "Home", href: "#" },
-    { name: "Pokedex", href: "#" },
-    { name: "About", href: "#" },
+    { name: "Home", href: "/" },
+    { name: "Pokedex", href: "/pokedex" },
   ];
 
   return (
@@ -40,13 +40,13 @@ const Nav = () => {
           <div className="hidden md:block">
             <div className="ml-10 flex items-baseline space-x-4">
               {navLinks.map((link) => (
-                <a
+                <Link
                   key={link.name}
                   href={link.href}
                   className="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-lg font-medium"
                 >
                   {link.name}
-                </a>
+                </Link>
               ))}
             </div>
           </div>
@@ -72,13 +72,13 @@ const Nav = () => {
         <div className="md:hidden" id="mobile-menu">
           <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
             {navLinks.map((link) => (
-              <a
+              <Link
                 key={link.name}
                 href={link.href}
                 className="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-lg font-medium"
               >
                 {link.name}
-              </a>
+              </Link>
             ))}
           </div>
         </div>
