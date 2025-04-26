@@ -45,6 +45,7 @@ const HomePage = () => {
       <h1 className="text-3xl font-bold text-center mb-6">Pokémon List</h1>
 
       {/* Search Bar */}
+      {/* TODO: make this into a workable component then import instead */}
       <div className="flex justify-center mb-6">
         <input
           type="text"
