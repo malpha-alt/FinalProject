@@ -1,11 +1,10 @@
 const BASE_URL = "https://pokeapi.co/api/v2";
 
-
 export async function fetchPokemonByName(name: string): Promise<any> {
   try {
-    const response = await fetch(`${BASE_URL}/pokemon/${name.toLowerCase()}`);
+    const response = await fetch(${BASE_URL}/pokemon/${name.toLowerCase()});
     if (!response.ok) {
-      throw new Error(`Failed to fetch Pokémon: ${response.statusText}`);
+      throw new Error(Failed to fetch Pokémon: ${response.statusText});
     }
     return await response.json();
   } catch (error) {
@@ -17,9 +16,9 @@ export async function fetchPokemonByName(name: string): Promise<any> {
 
 export async function fetchRandomPokemons(count: number): Promise<any[]> {
   try {
-    const response = await fetch(`${BASE_URL}/pokemon?limit=1000`);
+    const response = await fetch(${BASE_URL}/pokemon?limit=1000);
     if (!response.ok) {
-      throw new Error(`Failed to fetch Pokémon list: ${response.statusText}`);
+      throw new Error(Failed to fetch Pokémon list: ${response.statusText});
     }
     const data = await response.json();
     const allPokemons = data.results;
@@ -40,6 +39,59 @@ export async function fetchRandomPokemons(count: number): Promise<any[]> {
     );
 
     return detailedPokemons;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+}
+
+/**
+ * Fetch a list of Pokémon with minimal information (name and URL).
+ */
+export async function fetchPokemonList(
+  limit: number = 20
+): Promise<{ name: string; url: string }[]> {
+  try {
+    const response = await fetch(`${BASE_URL}/pokemon?limit=${limit}`);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch Pokémon list: ${response.statusText}`);
+    }
+    const data = await response.json();
+    return data.results; // Returns an array of { name, url }
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+}
+
+/**
+ * Fetch detailed information about a specific Pokémon.
+ */
+export async function fetchPokemonDetails(name: string): Promise<any> {
+  try {
+    const response = await fetch(`${BASE_URL}/pokemon/${name.toLowerCase()}`);
+    if (!response.ok) {
+      throw new Error(
+        `Failed to fetch Pokémon details: ${response.statusText}`
+      );
+    }
+    const data = await response.json();
+
+    // Extract relevant details
+    return {
+      id: data.id,
+      name: data.name,
+      abilities: data.abilities.map((a: any) => a.ability.name),
+      base_experience: data.base_experience,
+      height: data.height,
+      weight: data.weight,
+      types: data.types.map((t: any) => t.type.name),
+      stats: data.stats.map((s: any) => ({
+        name: s.stat.name,
+        value: s.base_stat,
+      })),
+      sprites: data.sprites.other["official-artwork"].front_default,
+    };
   } catch (error) {
     console.error(error);
     throw error;
