@@ -21,6 +21,7 @@ const Nav = () => {
 
   const navLinks = [
     { name: "Home", href: "/" },
+    { name: "Sign In", href: "/auth" },
     { name: "Pokedex", href: "/pokedex" },
   ];
 

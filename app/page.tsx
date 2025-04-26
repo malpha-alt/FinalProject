@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import Link from "next/link";
 import { fetchPokemonList } from "../api/services/pokemonApi";
+import PokemonCard from "../components/PokemonCard";
 
 const HomePage = () => {
   const [pokemonList, setPokemonList] = useState<
@@ -49,25 +49,13 @@ const HomePage = () => {
       </div>
 
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-        {pokemonList.map((pokemon) => {
-          const pokemonId = pokemon.url.split("/").filter(Boolean).pop(); // Extract ID from URL
-          const imageUrl = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemonId}.png`;
-
-          return (
-            <Link key={pokemon.name} href={`/pokemon/${pokemon.name}`}>
-              <div className="border border-gray-300 p-4 rounded-lg shadow-sm hover:shadow-lg hover:scale-102 transition-transform duration-200 ease-in-out">
-                <img
-                  src={imageUrl}
-                  alt={pokemon.name}
-                  className="w-full h-24 object-contain mb-2"
-                />
-                <h2 className="text-lg font-medium text-center capitalize">
-                  {pokemon.name}
-                </h2>
-              </div>
-            </Link>
-          );
-        })}
+        {pokemonList.map((pokemon) => (
+          <PokemonCard
+            key={pokemon.name}
+            name={pokemon.name}
+            url={pokemon.url}
+          />
+        ))}
       </div>
     </div>
   );
