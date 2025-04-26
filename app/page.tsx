@@ -2,6 +2,14 @@
 import React, { useEffect, useState } from "react";
 import { fetchPokemonList } from "./api/services/pokemonApi";
 import PokemonCard from "../components/PokemonCard";
+
+/**
+ * HomePage Component
+ * Created by Gabriel Levi Carneiro Ramos
+ *
+ * This component displays a list of Pokémon fetched from the API.
+ * It includes a search bar to filter Pokémon by name and renders each Pokémon as a card.
+ */
 const HomePage = () => {
   const [pokemonList, setPokemonList] = useState<
     { name: string; url: string }[]
