@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { fetchPokemonList } from "../api/services/pokemonApi";
+import { fetchPokemonList } from "./api/services/pokemonApi";
 import PokemonCard from "../components/PokemonCard";
 const HomePage = () => {
   const [pokemonList, setPokemonList] = useState<

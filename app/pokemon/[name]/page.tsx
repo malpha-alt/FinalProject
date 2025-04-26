@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import { fetchPokemonDetails } from "../../../api/services/pokemonApi";
+import { fetchPokemonDetails } from "../../api/services/pokemonApi";
 
 export default function PokemonPage() {
   const { name } = useParams(); // Access the Pokémon name from the dynamic route

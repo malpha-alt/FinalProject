@@ -7,6 +7,16 @@ interface PokemonCardProps {
   url: string;
 }
 
+/**
+ * PokemonCard Component
+ * Created by Gabriel Levi Carneiro Ramos
+ *
+ * Displays a Pokémon's name and image, and links to its details page.
+ *
+ * Props:
+ * - name: Pokémon's name.
+ * - url: API URL for the Pokémon's details.
+ */
 const PokemonCard: React.FC<PokemonCardProps> = ({ name, url }) => {
   const pokemonId = url.split("/").filter(Boolean).pop(); // Extract ID from URL
   const imageUrl = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemonId}.png`;
