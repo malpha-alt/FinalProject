@@ -1,3 +1,5 @@
+// Pokemon API service by matheus alpha U63492196
+
 const BASE_URL = "https://pokeapi.co/api/v2";
 
 export async function fetchPokemonByName(name: string): Promise<any> {
@@ -48,7 +50,7 @@ export async function fetchRandomPokemons(count: number): Promise<any[]> {
  * Fetch a list of Pokémon with minimal information (name and URL).
  */
 export async function fetchPokemonList(
-  limit: number = 20
+  limit: number = 20   
 ): Promise<{ name: string; url: string }[]> {
   try {
     const response = await fetch(`${BASE_URL}/pokemon?limit=${limit}`);
