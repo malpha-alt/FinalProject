@@ -7,23 +7,17 @@ import { FiMenu, FiX } from "react-icons/fi"; // Importing icons from react-icon
  * Nav Component
  * Created by Gabriel Levi Carneiro Ramos
  *
- * This component renders a responsive navigation bar for the Pokémon app.
- * It includes:
- * - A logo displayed on the left.
- * - Navigation links (Home, Pokedex) dynamically rendered from an array.
- * - A toggleable mobile menu using React state.
- * - React Icons (FiMenu and FiX) for the mobile menu button.
+ * Navigation bar component
+ *  - A logo displayed on the left, which also works as nav to home.
+ *  - A toggleable mobile menu using React state.
+ *  - React Icons (FiMenu and FiX) for the mobile menu button.
  *
- * The navigation bar is styled using Tailwind CSS and is fully responsive.
+ * Styled using Tailwind CSS and responsive.
  */
 const Nav = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  const navLinks = [
-    { name: "Home", href: "/" },
-    { name: "Sign In", href: "/auth" },
-    { name: "Pokedex", href: "/pokedex" },
-  ];
+  const navLinks = [{ name: "Home", href: "/" }];
 
   return (
     <nav className="bg-gray-800">
@@ -31,11 +25,13 @@ const Nav = () => {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <div className="flex-shrink-0">
-            <img
-              className="h-8 w-auto object-contain"
-              src="/logo.png"
-              alt="Pokemon App Logo"
-            />
+            <Link href="/">
+              <img
+                className="h-8 w-auto object-contain"
+                src="/logo.png"
+                alt="Pokemon App Logo"
+              />
+            </Link>
           </div>
           {/* Navigation Links */}
           <div className="hidden md:block">
