@@ -21,7 +21,7 @@ const HomePage = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const data = await fetchPokemonList( 1050); // Fetch Pokémon
+        const data = await fetchPokemonList(1050); // Fetch Pokémon
         setPokemonList(data);
       } catch (error) {
         console.error("Error fetching Pokémon list:", error);
@@ -42,7 +42,7 @@ const HomePage = () => {
   }
 
   return (
-    <div className="container mx-auto p-4">
+    <div className="container mx-auto p-4 h-[100vh]">
       <h1 className="text-3xl font-bold text-center mb-6">Pokémon List</h1>
 
       {/* Search Bar */}
@@ -51,16 +51,16 @@ const HomePage = () => {
 
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
         {pokemonList
-            .filter((pokemon) =>
-                pokemon.name.toLowerCase().includes(searchQuery.toLowerCase())
-            )
-            .map((pokemon) => (
-                <PokemonCard
-                    key={pokemon.name}
-                    name={pokemon.name}
-                    url={pokemon.url}
-                />
-            ))}
+          .filter((pokemon) =>
+            pokemon.name.toLowerCase().includes(searchQuery.toLowerCase())
+          )
+          .map((pokemon) => (
+            <PokemonCard
+              key={pokemon.name}
+              name={pokemon.name}
+              url={pokemon.url}
+            />
+          ))}
       </div>
     </div>
   );

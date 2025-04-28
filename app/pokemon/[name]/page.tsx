@@ -1,49 +1,50 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
+import { FiHeart } from "react-icons/fi";
 import { fetchPokemonDetails } from "../../api/services/pokemonApi";
 
+// Updated color scheme for dark mode
 const statColors: { [key: string]: string } = {
-  fire: "bg-red-800",
-  water: "bg-blue-500",
-  grass: "bg-green-500",
-  electric: "bg-yellow-400",
-  psychic: "bg-purple-500",
-  fairy: "bg-pink-500",
-  normal: "bg-gray-300",
-  fighting: "bg-orange-500",
-  flying: "bg-indigo-300",
-  poison: "bg-purple-800",
-  ground: "bg-yellow-800",
-  rock: "bg-yellow-600",
-  bug: "bg-green-400",
-  ghost: "bg-indigo-800",
-  steel: "bg-gray-500",
-  dragon: "bg-blue-800",
-  dark: "bg-gray-800",
-  ice: "bg-cyan-400",
-
-
+  fire: "bg-red-600",
+  water: "bg-blue-600",
+  grass: "bg-green-600",
+  electric: "bg-yellow-500",
+  psychic: "bg-purple-600",
+  fairy: "bg-pink-600",
+  normal: "bg-gray-500",
+  fighting: "bg-orange-600",
+  flying: "bg-indigo-500",
+  poison: "bg-purple-700",
+  ground: "bg-amber-700",
+  rock: "bg-yellow-700",
+  bug: "bg-lime-600",
+  ghost: "bg-violet-700",
+  steel: "bg-slate-600",
+  dragon: "bg-blue-700",
+  dark: "bg-neutral-700",
+  ice: "bg-cyan-600",
 };
+
 const textColors: { [key: string]: string } = {
-  fire: "text-red-700",
-  water: "text-blue-700",
-  grass: "text-green-800",
-  electric: "text-yellow-500",
-  psychic: "text-purple-600",
-  fairy: "text-pink-700",
-  normal: "text-gray-600",
-  fighting: "text-orange-700",
-  flying: "text-indigo-500",
-  poison: "text-purple-900",
-  ground: "text-yellow-900",
-  rock: "text-yellow-600",
-  bug: "text-green-500",
-  ghost: "text-indigo-800",
-  steel: "text-gray-700",
-  dragon: "text-blue-900",
-  dark: "text-gray-900",
-  ice: "text-cyan-800",
+  fire: "text-red-400",
+  water: "text-blue-400",
+  grass: "text-green-400",
+  electric: "text-yellow-400",
+  psychic: "text-purple-400",
+  fairy: "text-pink-400",
+  normal: "text-gray-400",
+  fighting: "text-orange-400",
+  flying: "text-indigo-400",
+  poison: "text-purple-400",
+  ground: "text-amber-400",
+  rock: "text-yellow-400",
+  bug: "text-lime-400",
+  ghost: "text-violet-400",
+  steel: "text-slate-400",
+  dragon: "text-blue-400",
+  dark: "text-neutral-400",
+  ice: "text-cyan-400",
 };
 
 export default function PokemonPage() {
@@ -51,6 +52,12 @@ export default function PokemonPage() {
   const [pokemon, setPokemon] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isLiked, setIsLiked] = useState(false);
+
+  const handleLikeClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setIsLiked(!isLiked);
+  };
 
   useEffect(() => {
     async function loadPokemon() {
@@ -97,53 +104,97 @@ export default function PokemonPage() {
   const typeClass = statColors[pokemonType] || "bg-gray-400";
   const textColorClass = textColors[primaryType] || "text-gray-800";
   return (
-    <div className={`container mx-auto p-4 rounded-lg shadow-lg`}>
-      <h1 className={`text-3xl font-bold text-center capitalize mb-6 ${textColorClass}`}>
-        {pokemon.name}
-      </h1>
-      <div className={`flex flex-col md:flex-row items-center md:items-start gap-6 ${textColorClass}`}>
-        <img
-          src={pokemon.sprites}
-          alt={pokemon.name}
-          className="w-48 h-48 object-contain mx-auto"
-        />
-        <div className="flex-1">
-          <h2 className="text-2xl font-semibold mb-4">Details</h2>
-          <ul className="list-disc list-inside space-y-2">
-            <li>
-              <strong>ID:</strong> {pokemon.id}
-            </li>
-            <li>
-              <strong>Base Experience:</strong> {pokemon.base_experience}
-            </li>
-            <li>
-              <strong>Height:</strong> {pokemon.height}
-            </li>
-            <li>
-              <strong>Weight:</strong> {pokemon.weight}
-            </li>
-            <li>
-              <strong>Types:</strong> {pokemon.types.join(", ")}
-            </li>
-            <li>
-              <strong>Abilities:</strong> {pokemon.abilities.join(", ")}
-            </li>
-          </ul>
-          <h2 className="text-2xl font-semibold mt-6 mb-4">Stats</h2>
-          <ul className="list-disc list-inside space-y-2">
-            {pokemon.stats.map((stat: any) => (
-            <div key={stat.name}>
-                <strong>{stat.name}:</strong> {stat.value}
-              <div className="w-full bg-gray-100 rounded-full h-4">
-                <div
-                    className={`${typeClass} h-4 rounded-full`}
-                    style={{ width: `${stat.value/255*100}%` }}
+    <div className="container mx-auto p-4 h-[120vh]">
+      <div className="max-w-6xl mx-auto bg-gray-900 rounded-2xl shadow-xl overflow-hidden relative">
+        {/* Like Button */}
+        <button
+          onClick={handleLikeClick}
+          className="absolute top-4 right-4 p-2 rounded-full hover:bg-gray-800 transition-colors z-10"
+        >
+          <FiHeart
+            className={`w-6 h-6 ${
+              isLiked ? "fill-red-500 stroke-red-500" : "stroke-gray-400"
+            }`}
+          />
+        </button>
+
+        {/* Header with gradient background */}
+        <div className={`p-6 ${textColorClass}`}>
+          <h1 className="text-4xl font-bold text-center capitalize mb-6">
+            {pokemon.name}
+          </h1>
+        </div>
+
+        <div className="p-6 bg-gray-900">
+          <div className="flex flex-col md:flex-row gap-8">
+            {/* Image Section */}
+            <div className="md:w-1/3">
+              <div className="bg-gray-800 rounded-xl p-6">
+                <img
+                  src={pokemon.sprites}
+                  alt={pokemon.name}
+                  className="w-full h-auto object-contain"
                 />
               </div>
             </div>
 
-            ))}
-          </ul>
+            {/* Details Section */}
+            <div className="md:w-2/3 text-gray-300">
+              <div className="bg-gray-800 rounded-xl p-6 mb-6">
+                <h2 className="text-2xl font-semibold mb-4">Details</h2>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <strong>ID:</strong> #{pokemon.id}
+                  </div>
+                  <div>
+                    <strong>Base XP:</strong> {pokemon.base_experience}
+                  </div>
+                  <div>
+                    <strong>Height:</strong> {pokemon.height / 10}m
+                  </div>
+                  <div>
+                    <strong>Weight:</strong> {pokemon.weight / 10}kg
+                  </div>
+                </div>
+                <div className="mt-4">
+                  <strong>Types:</strong>
+                  <div className="flex gap-2 mt-2">
+                    {pokemon.types.map((type: string) => (
+                      <span
+                        key={type}
+                        className={`${
+                          statColors[type.toLowerCase()]
+                        } px-3 py-1 rounded-full text-white text-sm`}
+                      >
+                        {type}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Stats Section */}
+              <div className="bg-gray-800 rounded-xl p-6">
+                <h2 className="text-2xl font-semibold mb-4">Stats</h2>
+                <div className="space-y-4">
+                  {pokemon.stats.map((stat: any) => (
+                    <div key={stat.name}>
+                      <div className="flex justify-between mb-1">
+                        <span className="capitalize">{stat.name}</span>
+                        <span>{stat.value}</span>
+                      </div>
+                      <div className="w-full bg-gray-700 rounded-full h-2">
+                        <div
+                          className={`${typeClass} h-2 rounded-full transition-all duration-500`}
+                          style={{ width: `${(stat.value / 255) * 100}%` }}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
