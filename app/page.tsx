@@ -3,65 +3,142 @@ import React, { useEffect, useState } from "react";
 import { fetchPokemonList } from "./api/services/pokemonApi";
 import PokemonCard from "../components/PokemonCard";
 import SearchBar from "../components/SearchBar";
+import { FiHeart } from "react-icons/fi";
 
-/**
- * HomePage Component
- * Created by Gabriel Levi Carneiro Ramos
- *
- * This component displays a list of Pokémon fetched from the API.
- * It includes a search bar to filter Pokémon by name and renders each Pokémon as a card.
- */
+const ITEMS_PER_PAGE = 20;
+
 const HomePage = () => {
-  const [pokemonList, setPokemonList] = useState<
-    { name: string; url: string }[]
-  >([]);
+  const [pokemonList, setPokemonList] = useState<{ name: string; url: string }[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+  const [likesMap, setLikesMap] = useState<{ [name: string]: number }>({});
+  const [likedMap, setLikedMap] = useState<{ [name: string]: boolean }>({});
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const data = await fetchPokemonList(1050); // Fetch Pokémon
-        setPokemonList(data);
+        setLoading(true);
+        const offset = (currentPage - 1) * ITEMS_PER_PAGE;
+        const res = await fetch(`https://pokeapi.co/api/v2/pokemon?limit=${ITEMS_PER_PAGE}&offset=${offset}`);
+        const data = await res.json();
+        setPokemonList(data.results); // Only 20 Pokémon now
+        setTotalCount(data.count);    // Total available Pokémon (for pagination)
+
+        const likesPromises = data.results.map(async (pokemon: any) => {
+          const res = await fetch(`/api/likes?name=${pokemon.name}`);
+          const likeData = await res.json();
+          return { name: pokemon.name, likes: likeData.likes || 0 };
+        });
+
+        const allLikes = await Promise.all(likesPromises);
+        const likesObject: { [name: string]: number } = {};
+        const likedObject: { [name: string]: boolean } = {};
+
+        allLikes.forEach(({ name, likes }) => {
+          likesObject[name] = likes;
+          likedObject[name] = likes > 0;
+        });
+
+        setLikesMap(likesObject);
+        setLikedMap(likedObject);
       } catch (error) {
-        console.error("Error fetching Pokémon list:", error);
+        console.error("Error fetching Pokémon list or likes:", error);
       } finally {
         setLoading(false);
       }
     };
 
     fetchData();
-  }, []);
+  }, [currentPage]); // Fetch whenever page changes
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
+    setCurrentPage(1); // Reset to first page when searching
   };
 
-  if (loading) {
-    return <div className="text-center text-gray-700">Loading Pokémon...</div>;
-  }
+  const handleLikeClick = async (e: React.MouseEvent, name: string) => {
+    e.preventDefault();
+    const isCurrentlyLiked = likedMap[name];
+
+    const res = await fetch(`/api/likes`, {
+      method: isCurrentlyLiked ? "DELETE" : "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name }),
+    });
+
+    const data = await res.json();
+
+    setLikesMap((prev) => ({
+      ...prev,
+      [name]: data.likes || 0,
+    }));
+
+    setLikedMap((prev) => ({
+      ...prev,
+      [name]: !isCurrentlyLiked,
+    }));
+  };
+
+  const filteredPokemon = pokemonList.filter((pokemon) =>
+    pokemon.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const totalPages = Math.ceil(totalCount / ITEMS_PER_PAGE);
 
   return (
-    <div className="container mx-auto p-4 h-[100vh]">
+    <div className="container mx-auto p-4 h-[100%]">
       <h1 className="text-3xl font-bold text-center mb-6">Pokémon List</h1>
 
-      {/* Search Bar */}
-      {/* Made by Julian Shyu */}
       <SearchBar value={searchQuery} onChange={handleSearchChange} />
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-        {pokemonList
-          .filter((pokemon) =>
-            pokemon.name.toLowerCase().includes(searchQuery.toLowerCase())
-          )
-          .map((pokemon) => (
-            <PokemonCard
-              key={pokemon.name}
-              name={pokemon.name}
-              url={pokemon.url}
-            />
-          ))}
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-6">
+        {filteredPokemon.map((pokemon) => (
+          <div
+            key={pokemon.name}
+            className="relative group cursor-pointer transition-transform hover:scale-105"
+          >
+            <PokemonCard name={pokemon.name} url={pokemon.url} />
+            <button
+              onClick={(e) => handleLikeClick(e, pokemon.name)}
+              className="absolute top-2 right-2 p-1 rounded-full hover:bg-gray-800 transition-colors flex items-center gap-1 bg-gray-900 bg-opacity-70"
+            >
+              <FiHeart
+                className={`w-5 h-5 ${
+                  likedMap[pokemon.name]
+                    ? "fill-red-500 stroke-red-500"
+                    : "stroke-gray-400"
+                }`}
+              />
+              <span className="text-xs text-white">{likesMap[pokemon.name] || 0}</span>
+            </button>
+          </div>
+        ))}
       </div>
+
+      {/* Pagination controls */}
+      {totalPages > 1 && (
+        <div className="flex justify-center items-center gap-4 mt-4">
+          <button
+            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+            disabled={currentPage === 1}
+            className="px-4 py-2 rounded bg-gray-700 text-white disabled:opacity-50"
+          >
+            Previous
+          </button>
+          <span className="text-gray-700">
+            Page {currentPage} of {totalPages}
+          </span>
+          <button
+            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+            disabled={currentPage === totalPages}
+            className="px-4 py-2 rounded bg-gray-700 text-white disabled:opacity-50"
+          >
+            Next
+          </button>
+        </div>
+      )}
     </div>
   );
 };

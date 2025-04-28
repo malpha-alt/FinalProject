@@ -4,6 +4,9 @@ import { useParams } from "next/navigation";
 import { FiHeart } from "react-icons/fi";
 import { fetchPokemonDetails } from "../../api/services/pokemonApi";
 
+
+
+
 // Updated color scheme for dark mode
 const statColors: { [key: string]: string } = {
   fire: "bg-red-600",
@@ -53,11 +56,42 @@ export default function PokemonPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isLiked, setIsLiked] = useState(false);
+  const [likes, setLikes] = useState<number>(0);
 
-  const handleLikeClick = (e: React.MouseEvent) => {
+  // Load likes from API
+  useEffect(() => {
+    async function fetchLikes() {
+      if (name) {
+        const res = await fetch(`/api/likes?name=${name}`);
+        const data = await res.json();
+        setLikes(data.likes || 0);
+        setIsLiked(data.likes > 0);
+      }
+    }
+    fetchLikes();
+  }, [name]);
+  
+  // Handle like click
+  const handleLikeClick = async (e: React.MouseEvent) => {
     e.preventDefault();
+    let method = "POST";
+    if (isLiked) {
+      method = "DELETE";
+    }
+  
+    const res = await fetch(`/api/likes`, {
+      method,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name }),
+    });
+  
+    const data = await res.json();
+    setLikes(data.likes || 0);
     setIsLiked(!isLiked);
   };
+  
+  
+
 
   useEffect(() => {
     async function loadPokemon() {
@@ -108,15 +142,17 @@ export default function PokemonPage() {
       <div className="max-w-6xl mx-auto bg-gray-900 rounded-2xl shadow-xl overflow-hidden relative">
         {/* Like Button */}
         <button
-          onClick={handleLikeClick}
-          className="absolute top-4 right-4 p-2 rounded-full hover:bg-gray-800 transition-colors z-10"
-        >
-          <FiHeart
-            className={`w-6 h-6 ${
-              isLiked ? "fill-red-500 stroke-red-500" : "stroke-gray-400"
-            }`}
-          />
-        </button>
+  onClick={handleLikeClick}
+  className="absolute top-4 right-4 p-2 rounded-full hover:bg-gray-800 transition-colors z-10 flex items-center gap-2"
+>
+  <FiHeart
+    className={`w-6 h-6 ${
+      likes > 0 ? "fill-red-500 stroke-red-500" : "stroke-gray-400"
+    }`}
+  />
+  <span>{likes}</span>
+</button>
+
 
         {/* Header with gradient background */}
         <div className={`p-6 ${textColorClass}`}>

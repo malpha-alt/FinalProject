@@ -49,21 +49,15 @@ export async function fetchRandomPokemons(count: number): Promise<any[]> {
 /**
  * Fetch a list of Pokémon with minimal information (name and URL).
  */
-export async function fetchPokemonList(
-  limit: number = 20   
-): Promise<{ name: string; url: string }[]> {
-  try {
-    const response = await fetch(`${BASE_URL}/pokemon?limit=${limit}`);
-    if (!response.ok) {
-      throw new Error(`Failed to fetch Pokémon list: ${response.statusText}`);
-    }
-    const data = await response.json();
-    return data.results; // Returns an array of { name, url }
-  } catch (error) {
-    console.error(error);
-    throw error;
+export async function fetchPokemonList(limit = 20, offset = 0) {
+  const res = await fetch(`https://pokeapi.co/api/v2/pokemon?limit=${limit}&offset=${offset}`);
+  if (!res.ok) {
+    throw new Error("Failed to fetch Pokémon list");
   }
+  const data = await res.json();
+  return data.results; // [{name, url}, {name, url}, ...]
 }
+
 
 /**
  * Fetch detailed information about a specific Pokémon.
