@@ -30,8 +30,14 @@ export async function POST(request: Request) {
     }
 
     const db = await connectToDB();
- 
+    const result = await db.collection('likes').updateOne(
+      { name },
+      { $inc: { count: 1 } },
+      { upsert: true }
+    );
     
+    console.log(result);
+
     const updatedDoc = await db.collection('likes').findOne({ name });
     return NextResponse.json({ likes: updatedDoc?.count || 1 });
   } catch (error) {
@@ -49,6 +55,12 @@ export async function DELETE(request: Request) {
     }
 
     const db = await connectToDB();
+    const result = await db.collection('likes').updateOne(
+      { name },
+      { $inc: { count: -1 } }
+    );
+
+    console.log(result);
     
     const updatedDoc = await db.collection('likes').findOne({ name });
     return NextResponse.json({ likes: updatedDoc?.count || 0 });
