@@ -83,7 +83,7 @@ const HomePage = () => {
   return (
     <div className="container mx-auto p-4 h-[100%]">
       <h1 className="text-3xl font-bold text-center mb-6">Whats the best Pokémon?</h1>
-      <p className="text-center mb-6">Vote for your favourite Pokémon and see how many likes they get</p>
+      <p className="text-center mb-6">Vote as many times as you want for your favourite Pokémon and see how many likes they get</p>
 
       {/* Integrated Search Bar */}
       <div className="flex justify-center mb-6">
