@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Pokemon Database",
-  description: "A database of all Pokemon",
+  title: "Whats the best pokemon?",
+  description: "Favourite pokemon of the internet by you",
 };
 
 export default function RootLayout({

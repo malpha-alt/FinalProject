@@ -60,7 +60,8 @@ const HomePage = () => {
 
   return (
     <div className="container mx-auto p-4 h-[100%]">
-      <h1 className="text-3xl font-bold text-center mb-6">Pokémon List</h1>
+      <h1 className="text-3xl font-bold text-center mb-6">Whats the best pokemon?</h1>
+      <p className="text-center mb-6">Vote for your favourite pokemon and see how many likes they get</p>
 
       <SearchBar value={searchQuery} onChange={handleSearchChange} />
 
