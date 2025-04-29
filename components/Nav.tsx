@@ -8,7 +8,7 @@ import { FiMenu, FiX } from "react-icons/fi"; // Importing icons from react-icon
  * Created by Gabriel Levi Carneiro Ramos
  *
  * Navigation bar component
- *  - A logo displayed on the left, which also works as nav to home.
+ *  - logo displayed on the left, which also works as nav to home.
  *  - A toggleable mobile menu using React state.
  *  - React Icons (FiMenu and FiX) for the mobile menu button.
  *

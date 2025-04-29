@@ -13,7 +13,7 @@ interface PokemonCardProps {
  * Created by Gabriel Levi Carneiro Ramos
  *
  * Displays a Pokémon's name and image, and links to its details page.
- * Features a like button in the upper right corner that only adds likes.
+ * has like button in the upper right corner that adds likes.
  *
  * Props:
  * - name: Pokémon's name.

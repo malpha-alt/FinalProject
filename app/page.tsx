@@ -11,6 +11,19 @@ interface Pokemon {
   likes: number;
 }
 
+/**
+ * HomePage Component
+ * Created by: Gabriel Levi Carneiro Ramos
+ *
+ * A React component that displays a paginated list of Pokémon with search functionality.
+ * Features:
+ * - Fetches Pokémon data from PokeAPI
+ * - Implements a like system with persistence
+ * - Displays Pokémon in a responsive grid layout
+ * - lets searching Pokémon by name
+ * - Includes pagination with 20 items per page
+ * - Sorts Pokémon by number of likes (descending) and then alphabetically
+ */
 const HomePage = () => {
   const [allPokemon, setAllPokemon] = useState<Pokemon[]>([]);
   const [displayedPokemon, setDisplayedPokemon] = useState<Pokemon[]>([]);
@@ -82,8 +95,13 @@ const HomePage = () => {
 
   return (
     <div className="container mx-auto p-4 h-[100%]">
-      <h1 className="text-3xl font-bold text-center mb-6">Whats the best Pokémon?</h1>
-      <p className="text-center mb-6">Vote as many times as you want for your favourite Pokémon and see how many likes they get</p>
+      <h1 className="text-3xl font-bold text-center mb-6">
+        Whats the best Pokémon?
+      </h1>
+      <p className="text-center mb-6">
+        Vote as many times as you want for your favourite Pokémon and see how
+        many likes they get
+      </p>
 
       {/* Integrated Search Bar */}
       <div className="flex justify-center mb-6">
