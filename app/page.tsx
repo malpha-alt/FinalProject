@@ -1,60 +1,82 @@
 "use client";
 import React, { useEffect, useState } from "react";
+import { FiSearch } from "react-icons/fi";
 import PokemonCard from "../components/PokemonCard";
-import SearchBar from "../components/SearchBar";
+
 const ITEMS_PER_PAGE = 20;
 
+interface Pokemon {
+  name: string;
+  url: string;
+  likes: number;
+}
+
 const HomePage = () => {
-  const [pokemonList, setPokemonList] = useState<{ name: string; url: string }[]>([]);
+  const [allPokemon, setAllPokemon] = useState<Pokemon[]>([]);
+  const [displayedPokemon, setDisplayedPokemon] = useState<Pokemon[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchAllPokemon = async () => {
       try {
         setLoading(true);
-        const offset = (currentPage - 1) * ITEMS_PER_PAGE;
-        const res = await fetch(`https://pokeapi.co/api/v2/pokemon?limit=${ITEMS_PER_PAGE}&offset=${offset}`);
+        const res = await fetch("https://pokeapi.co/api/v2/pokemon?limit=1000");
         const data = await res.json();
-        setPokemonList(data.results); // Only 20 Pokémon now
-        setTotalCount(data.count);    // Total available Pokémon (for pagination)
 
-        const likesPromises = data.results.map(async (pokemon: { name: string }) => {
-          const res = await fetch(`/api/likes?name=${pokemon.name}`);
-          const likeData = await res.json();
-          return { name: pokemon.name, likes: likeData.likes || 0 };
-        });
+        // Fetch all likes at once
+        const likesRes = await fetch("/api/likes/all");
+        if (!likesRes.ok) {
+          throw new Error("Failed to fetch likes");
+        }
+        const likesData = await likesRes.json();
 
-        const allLikes = await Promise.all(likesPromises);
-        const likesObject: { [name: string]: number } = {};
-        const likedObject: { [name: string]: boolean } = {};
+        const pokemonWithLikes = data.results.map((pokemon: Pokemon) => ({
+          ...pokemon,
+          likes: likesData[pokemon.name] || 0,
+        }));
 
-        allLikes.forEach(({ name, likes }) => {
-          likesObject[name] = likes;
-          likedObject[name] = likes > 0;
-        });
+        // Sort by likes (descending) and then by name
+        const sortedPokemon = pokemonWithLikes.sort(
+          (a: Pokemon, b: Pokemon) => {
+            if (b.likes !== a.likes) {
+              return b.likes - a.likes;
+            }
+            return a.name.localeCompare(b.name);
+          }
+        );
 
-
+        setAllPokemon(sortedPokemon);
+        setDisplayedPokemon(sortedPokemon.slice(0, ITEMS_PER_PAGE));
+        setTotalCount(sortedPokemon.length);
       } catch (error) {
-        console.error("Error fetching Pokémon list or likes:", error);
+        console.error("Error fetching Pokemon:", error);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchData();
-  }, [currentPage]); // Fetch whenever page changes
+    fetchAllPokemon();
+  }, []);
+
+  useEffect(() => {
+    const filtered = allPokemon.filter((pokemon) =>
+      pokemon.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+
+    setTotalCount(filtered.length);
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    setDisplayedPokemon(
+      filtered.slice(startIndex, startIndex + ITEMS_PER_PAGE)
+    );
+  }, [searchQuery, currentPage, allPokemon]);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
-    setCurrentPage(1); // Reset to first page when searching
+    setCurrentPage(1);
   };
-
-  const filteredPokemon = pokemonList.filter((pokemon) =>
-    pokemon.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
 
   const totalPages = Math.ceil(totalCount / ITEMS_PER_PAGE);
 
@@ -62,7 +84,19 @@ const HomePage = () => {
     <div className="container mx-auto p-4 h-[100%]">
       <h1 className="text-3xl font-bold text-center mb-6">Pokémon List</h1>
 
-      <SearchBar value={searchQuery} onChange={handleSearchChange} />
+      {/* Integrated Search Bar */}
+      <div className="flex justify-center mb-6">
+        <div className="relative w-full max-w-md">
+          <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={handleSearchChange}
+            placeholder="Search Pokémon by name"
+            className="w-full p-2 pl-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+      </div>
 
       {loading ? (
         <div className="flex justify-center items-center h-64">
@@ -71,19 +105,16 @@ const HomePage = () => {
       ) : (
         <>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-6">
-            {filteredPokemon.map((pokemon) => (
+            {displayedPokemon.map((pokemon) => (
               <div
                 key={pokemon.name}
                 className="relative group cursor-pointer transition-transform hover:scale-105"
               >
                 <PokemonCard name={pokemon.name} url={pokemon.url} />
-                
-                  
               </div>
             ))}
           </div>
 
-          {/* Pagination controls */}
           {totalPages > 1 && (
             <div className="flex justify-center items-center gap-4 mt-4">
               <button
@@ -97,7 +128,9 @@ const HomePage = () => {
                 Page {currentPage} of {totalPages}
               </span>
               <button
-                onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                onClick={() =>
+                  setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                }
                 disabled={currentPage === totalPages}
                 className="px-4 py-2 rounded bg-gray-700 text-white disabled:opacity-50"
               >
