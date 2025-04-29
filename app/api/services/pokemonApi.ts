@@ -1,6 +1,6 @@
 // Pokemon API service by matheus alpha U63492196
 
-import { Pokemon, PokemonListResponse } from "@/types";
+import { Pokemon } from "@/types";
 const BASE_URL = "https://pokeapi.co/api/v2";
 
 export async function fetchPokemonByName(name: string): Promise<Pokemon> {
@@ -77,12 +77,12 @@ export async function fetchPokemonDetails(name: string): Promise<Pokemon> {
     return {
       id: data.id,
       name: data.name,
-      abilities: data.abilities.map((a: any) => a.ability.name),
+      abilities: data.abilities.map((a: { ability: { name: string } }) => a.ability.name),
       base_experience: data.base_experience,
       height: data.height,
       weight: data.weight,
-      types: data.types.map((t: any) => t.type.name),
-      stats: data.stats.map((s: any) => ({
+      types: data.types.map((t: { type: { name: string } }) => t.type.name),
+      stats: data.stats.map((s: { stat: { name: string }; base_stat: number }) => ({
         name: s.stat.name,
         value: s.base_stat,
       })),

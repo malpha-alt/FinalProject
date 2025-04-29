@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import { FiHeart } from "react-icons/fi";
 import { fetchPokemonDetails } from "../../api/services/pokemonApi";
+import Image from "next/image";
 
 
 
@@ -166,8 +167,8 @@ export default function PokemonPage() {
             {/* Image Section */}
             <div className="md:w-1/3">
               <div className="bg-gray-800 rounded-xl p-6">
-                <img
-                  src={pokemon.sprites}
+                <Image
+                  src={pokemon.sprites.front_default}
                   alt={pokemon.name}
                   className="w-full h-auto object-contain"
                 />

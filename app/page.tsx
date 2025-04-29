@@ -1,6 +1,5 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { fetchPokemonList } from "./api/services/pokemonApi";
 import PokemonCard from "../components/PokemonCard";
 import SearchBar from "../components/SearchBar";
 import { FiHeart } from "react-icons/fi";
@@ -26,7 +25,7 @@ const HomePage = () => {
         setPokemonList(data.results); // Only 20 Pokémon now
         setTotalCount(data.count);    // Total available Pokémon (for pagination)
 
-        const likesPromises = data.results.map(async (pokemon: any) => {
+        const likesPromises = data.results.map(async (pokemon: { name: string }) => {
           const res = await fetch(`/api/likes?name=${pokemon.name}`);
           const likeData = await res.json();
           return { name: pokemon.name, likes: likeData.likes || 0 };
@@ -93,51 +92,59 @@ const HomePage = () => {
 
       <SearchBar value={searchQuery} onChange={handleSearchChange} />
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-6">
-        {filteredPokemon.map((pokemon) => (
-          <div
-            key={pokemon.name}
-            className="relative group cursor-pointer transition-transform hover:scale-105"
-          >
-            <PokemonCard name={pokemon.name} url={pokemon.url} />
-            <button
-              onClick={(e) => handleLikeClick(e, pokemon.name)}
-              className="absolute top-2 right-2 p-1 rounded-full hover:bg-gray-800 transition-colors flex items-center gap-1 bg-gray-900 bg-opacity-70"
-            >
-              <FiHeart
-                className={`w-5 h-5 ${
-                  likedMap[pokemon.name]
-                    ? "fill-red-500 stroke-red-500"
-                    : "stroke-gray-400"
-                }`}
-              />
-              <span className="text-xs text-white">{likesMap[pokemon.name] || 0}</span>
-            </button>
-          </div>
-        ))}
-      </div>
-
-      {/* Pagination controls */}
-      {totalPages > 1 && (
-        <div className="flex justify-center items-center gap-4 mt-4">
-          <button
-            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-            disabled={currentPage === 1}
-            className="px-4 py-2 rounded bg-gray-700 text-white disabled:opacity-50"
-          >
-            Previous
-          </button>
-          <span className="text-gray-700">
-            Page {currentPage} of {totalPages}
-          </span>
-          <button
-            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-            disabled={currentPage === totalPages}
-            className="px-4 py-2 rounded bg-gray-700 text-white disabled:opacity-50"
-          >
-            Next
-          </button>
+      {loading ? (
+        <div className="flex justify-center items-center h-64">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
         </div>
+      ) : (
+        <>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-6">
+            {filteredPokemon.map((pokemon) => (
+              <div
+                key={pokemon.name}
+                className="relative group cursor-pointer transition-transform hover:scale-105"
+              >
+                <PokemonCard name={pokemon.name} url={pokemon.url} />
+                <button
+                  onClick={(e) => handleLikeClick(e, pokemon.name)}
+                  className="absolute top-2 right-2 p-1 rounded-full hover:bg-gray-800 transition-colors flex items-center gap-1 bg-gray-900 bg-opacity-70"
+                >
+                  <FiHeart
+                    className={`w-5 h-5 ${
+                      likedMap[pokemon.name]
+                        ? "fill-red-500 stroke-red-500"
+                        : "stroke-gray-400"
+                    }`}
+                  />
+                  <span className="text-xs text-white">{likesMap[pokemon.name] || 0}</span>
+                </button>
+              </div>
+            ))}
+          </div>
+
+          {/* Pagination controls */}
+          {totalPages > 1 && (
+            <div className="flex justify-center items-center gap-4 mt-4">
+              <button
+                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1}
+                className="px-4 py-2 rounded bg-gray-700 text-white disabled:opacity-50"
+              >
+                Previous
+              </button>
+              <span className="text-gray-700">
+                Page {currentPage} of {totalPages}
+              </span>
+              <button
+                onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                disabled={currentPage === totalPages}
+                className="px-4 py-2 rounded bg-gray-700 text-white disabled:opacity-50"
+              >
+                Next
+              </button>
+            </div>
+          )}
+        </>
       )}
     </div>
   );
