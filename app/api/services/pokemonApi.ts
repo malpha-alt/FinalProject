@@ -83,12 +83,12 @@ export async function fetchPokemonDetails(name: string): Promise<Pokemon> {
           data.sprites.other["official-artwork"].front_default ||
           data.sprites.front_default,
       },
-      types: data.types.map((t: any) => ({
+      types: data.types.map((t: { type: { name: string } }) => ({
         type: {
           name: t.type.name,
         },
       })),
-      stats: data.stats.map((s: any) => ({
+      stats: data.stats.map((s: { stat: { name: string }; base_stat: number }) => ({
         base_stat: s.base_stat,
         stat: {
           name: s.stat.name,
@@ -97,7 +97,7 @@ export async function fetchPokemonDetails(name: string): Promise<Pokemon> {
       height: data.height,
       weight: data.weight,
       base_experience: data.base_experience,
-      abilities: data.abilities.map((a: any) => ({
+      abilities: data.abilities.map((a: { ability: { name: string } }) => ({
         ability: {
           name: a.ability.name,
         },

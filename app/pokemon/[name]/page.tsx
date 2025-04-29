@@ -54,6 +54,13 @@ export default function PokemonPage() {
   const name = params?.name as string;
   console.log("params", params);
 
+ 
+
+  const [pokemon, setPokemon] = useState<Pokemon | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [likes, setLikes] = useState<number>(0);
+
   if (!name) {
     return (
       <div className="text-center text-red-500 p-4">
@@ -61,12 +68,6 @@ export default function PokemonPage() {
       </div>
     );
   }
-
-  const [pokemon, setPokemon] = useState<Pokemon | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [likes, setLikes] = useState<number>(0);
-
   // Load likes from API
   useEffect(() => {
     async function fetchLikes() {

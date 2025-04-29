@@ -2,15 +2,12 @@
 import React, { useEffect, useState } from "react";
 import PokemonCard from "../components/PokemonCard";
 import SearchBar from "../components/SearchBar";
-import { FiHeart } from "react-icons/fi";
-
 const ITEMS_PER_PAGE = 20;
 
 const HomePage = () => {
   const [pokemonList, setPokemonList] = useState<{ name: string; url: string }[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
-  const [likesMap, setLikesMap] = useState<{ [name: string]: number }>({});
   const [likedMap, setLikedMap] = useState<{ [name: string]: boolean }>({});
   const [currentPage, setCurrentPage] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
@@ -40,8 +37,7 @@ const HomePage = () => {
           likedObject[name] = likes > 0;
         });
 
-        setLikesMap(likesObject);
-        setLikedMap(likedObject);
+
       } catch (error) {
         console.error("Error fetching Pokémon list or likes:", error);
       } finally {
@@ -55,29 +51,6 @@ const HomePage = () => {
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
     setCurrentPage(1); // Reset to first page when searching
-  };
-
-  const handleLikeClick = async (e: React.MouseEvent, name: string) => {
-    e.preventDefault();
-    const isCurrentlyLiked = likedMap[name];
-
-    const res = await fetch(`/api/likes`, {
-      method: isCurrentlyLiked ? "DELETE" : "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name }),
-    });
-
-    const data = await res.json();
-
-    setLikesMap((prev) => ({
-      ...prev,
-      [name]: data.likes || 0,
-    }));
-
-    setLikedMap((prev) => ({
-      ...prev,
-      [name]: !isCurrentlyLiked,
-    }));
   };
 
   const filteredPokemon = pokemonList.filter((pokemon) =>
