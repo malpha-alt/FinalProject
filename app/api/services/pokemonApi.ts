@@ -1,8 +1,9 @@
 // Pokemon API service by matheus alpha U63492196
 
+import { Pokemon, PokemonListResponse } from "@/types";
 const BASE_URL = "https://pokeapi.co/api/v2";
 
-export async function fetchPokemonByName(name: string): Promise<any> {
+export async function fetchPokemonByName(name: string): Promise<Pokemon> {
   try {
     const response = await fetch(`${BASE_URL}/pokemon/${name.toLowerCase()}`);
     if (!response.ok) {
@@ -15,7 +16,7 @@ export async function fetchPokemonByName(name: string): Promise<any> {
   }
 }
 
-export async function fetchRandomPokemons(count: number): Promise<any[]> {
+export async function fetchRandomPokemons(count: number): Promise<Pokemon[]> {
   try {
     const response = await fetch(`${BASE_URL}/pokemon?limit=1000`);
     if (!response.ok) {
@@ -62,7 +63,7 @@ export async function fetchPokemonList(limit = 20, offset = 0) {
 /**
  * Fetch detailed information about a specific Pokémon.
  */
-export async function fetchPokemonDetails(name: string): Promise<any> {
+export async function fetchPokemonDetails(name: string): Promise<Pokemon> {
   try {
     const response = await fetch(`${BASE_URL}/pokemon/${name.toLowerCase()}`);
     if (!response.ok) {
