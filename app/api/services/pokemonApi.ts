@@ -51,14 +51,15 @@ export async function fetchRandomPokemons(count: number): Promise<Pokemon[]> {
  * Fetch a list of Pokémon with minimal information (name and URL).
  */
 export async function fetchPokemonList(limit = 20, offset = 0) {
-  const res = await fetch(`https://pokeapi.co/api/v2/pokemon?limit=${limit}&offset=${offset}`);
+  const res = await fetch(
+    `https://pokeapi.co/api/v2/pokemon?limit=${limit}&offset=${offset}`
+  );
   if (!res.ok) {
     throw new Error("Failed to fetch Pokémon list");
   }
   const data = await res.json();
   return data.results; // [{name, url}, {name, url}, ...]
 }
-
 
 /**
  * Fetch detailed information about a specific Pokémon.
@@ -73,20 +74,34 @@ export async function fetchPokemonDetails(name: string): Promise<Pokemon> {
     }
     const data = await response.json();
 
-    // Extract relevant details
+    // Transform the data to match the Pokemon type
     return {
       id: data.id,
       name: data.name,
-      abilities: data.abilities.map((a: { ability: { name: string } }) => a.ability.name),
-      base_experience: data.base_experience,
+      sprites: {
+        front_default:
+          data.sprites.other["official-artwork"].front_default ||
+          data.sprites.front_default,
+      },
+      types: data.types.map((t: any) => ({
+        type: {
+          name: t.type.name,
+        },
+      })),
+      stats: data.stats.map((s: any) => ({
+        base_stat: s.base_stat,
+        stat: {
+          name: s.stat.name,
+        },
+      })),
       height: data.height,
       weight: data.weight,
-      types: data.types.map((t: { type: { name: string } }) => t.type.name),
-      stats: data.stats.map((s: { stat: { name: string }; base_stat: number }) => ({
-        name: s.stat.name,
-        value: s.base_stat,
+      base_experience: data.base_experience,
+      abilities: data.abilities.map((a: any) => ({
+        ability: {
+          name: a.ability.name,
+        },
       })),
-      sprites: data.sprites.other["official-artwork"].front_default,
     };
   } catch (error) {
     console.error(error);
