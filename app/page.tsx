@@ -8,7 +8,6 @@ const HomePage = () => {
   const [pokemonList, setPokemonList] = useState<{ name: string; url: string }[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
-  const [likedMap, setLikedMap] = useState<{ [name: string]: boolean }>({});
   const [currentPage, setCurrentPage] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
 

@@ -61,13 +61,7 @@ export default function PokemonPage() {
   const [error, setError] = useState<string | null>(null);
   const [likes, setLikes] = useState<number>(0);
 
-  if (!name) {
-    return (
-      <div className="text-center text-red-500 p-4">
-        <p>Pokémon name not found</p>
-      </div>
-    );
-  }
+  
   // Load likes from API
   useEffect(() => {
     async function fetchLikes() {
@@ -119,6 +113,14 @@ export default function PokemonPage() {
 
     loadPokemon();
   }, [name]);
+
+  if (!name) {
+    return (
+      <div className="text-center text-red-500 p-4">
+        <p>Pokémon name not found</p>
+      </div>
+    );
+  }
 
   if (loading) {
     return (
