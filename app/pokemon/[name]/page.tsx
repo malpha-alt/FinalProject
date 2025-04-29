@@ -4,9 +4,7 @@ import { useParams } from "next/navigation";
 import { FiHeart } from "react-icons/fi";
 import { fetchPokemonDetails } from "../../api/services/pokemonApi";
 import Image from "next/image";
-
-
-
+import { Pokemon } from "@/types";
 
 // Updated color scheme for dark mode
 const statColors: { [key: string]: string } = {
@@ -52,53 +50,63 @@ const textColors: { [key: string]: string } = {
 };
 
 export default function PokemonPage() {
-  const { name } = useParams(); // Access the Pokémon name from the dynamic route
-  const [pokemon, setPokemon] = useState<any>(null);
+  const params = useParams();
+  const name = params?.name as string;
+  console.log("params", params);
+
+  if (!name) {
+    return (
+      <div className="text-center text-red-500 p-4">
+        <p>Pokémon name not found</p>
+      </div>
+    );
+  }
+
+  const [pokemon, setPokemon] = useState<Pokemon | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [isLiked, setIsLiked] = useState(false);
   const [likes, setLikes] = useState<number>(0);
 
   // Load likes from API
   useEffect(() => {
     async function fetchLikes() {
-      if (name) {
+      try {
         const res = await fetch(`/api/likes?name=${name}`);
+        if (!res.ok) throw new Error("Failed to fetch likes");
         const data = await res.json();
         setLikes(data.likes || 0);
-        setIsLiked(data.likes > 0);
+      } catch (error) {
+        console.error("Error fetching likes:", error);
+        setLikes(0);
       }
     }
     fetchLikes();
   }, [name]);
-  
-  // Handle like click
+
+  // Handle like click - only adds likes
   const handleLikeClick = async (e: React.MouseEvent) => {
     e.preventDefault();
-    let method = "POST";
-    if (isLiked) {
-      method = "DELETE";
-    }
-  
-    const res = await fetch(`/api/likes`, {
-      method,
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name }),
-    });
-  
-    const data = await res.json();
-    setLikes(data.likes || 0);
-    setIsLiked(!isLiked);
-  };
-  
-  
+    try {
+      const res = await fetch(`/api/likes`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name }),
+      });
 
+      if (!res.ok) throw new Error("Failed to update likes");
+
+      const data = await res.json();
+      setLikes(data.likes || 0);
+    } catch (error) {
+      console.error("Error updating likes:", error);
+    }
+  };
 
   useEffect(() => {
     async function loadPokemon() {
       setLoading(true);
       try {
-        const data = await fetchPokemonDetails(name as string);
+        const data = await fetchPokemonDetails(name);
         setPokemon(data);
       } catch (err) {
         console.error("Failed to load Pokémon:", err);
@@ -108,9 +116,7 @@ export default function PokemonPage() {
       }
     }
 
-    if (name) {
-      loadPokemon();
-    }
+    loadPokemon();
   }, [name]);
 
   if (loading) {
@@ -130,8 +136,17 @@ export default function PokemonPage() {
     );
   }
 
-  const primaryType = pokemon.types[0]?.toLowerCase();
-  const secondaryType = pokemon.types[1]?.toLowerCase();
+  if (loading || !pokemon) {
+    return (
+      <div className="text-center text-gray-700">
+        Loading Pokémon details...
+      </div>
+    );
+  }
+
+  const primaryType =
+    pokemon?.types?.[0]?.type?.name?.toLowerCase?.() ?? "normal";
+  const secondaryType = pokemon?.types?.[1]?.type?.name?.toLowerCase?.();
 
   // Use the secondary pokemon type if available, or use primary type (Julian Shyu)
   const pokemonType = secondaryType || primaryType;
@@ -143,17 +158,12 @@ export default function PokemonPage() {
       <div className="max-w-6xl mx-auto bg-gray-900 rounded-2xl shadow-xl overflow-hidden relative">
         {/* Like Button */}
         <button
-  onClick={handleLikeClick}
-  className="absolute top-4 right-4 p-2 rounded-full hover:bg-gray-800 transition-colors z-10 flex items-center gap-2"
->
-  <FiHeart
-    className={`w-6 h-6 ${
-      likes > 0 ? "fill-red-500 stroke-red-500" : "stroke-gray-400"
-    }`}
-  />
-  <span>{likes}</span>
-</button>
-
+          onClick={handleLikeClick}
+          className="absolute top-4 right-4 p-2 rounded-full hover:bg-gray-800 transition-colors z-10 flex items-center gap-2"
+        >
+          <FiHeart className="w-6 h-6 fill-red-500 stroke-red-500" />
+          <span>{likes}</span>
+        </button>
 
         {/* Header with gradient background */}
         <div className={`p-6 ${textColorClass}`}>
@@ -167,11 +177,15 @@ export default function PokemonPage() {
             {/* Image Section */}
             <div className="md:w-1/3">
               <div className="bg-gray-800 rounded-xl p-6">
-                <Image
-                  src={pokemon.sprites.front_default}
-                  alt={pokemon.name}
-                  className="w-full h-auto object-contain"
-                />
+                {pokemon?.sprites?.front_default && (
+                  <Image
+                    src={pokemon.sprites.front_default}
+                    alt={pokemon.name}
+                    width={200}
+                    height={200}
+                    className="w-full h-auto object-contain"
+                  />
+                )}
               </div>
             </div>
 
@@ -196,16 +210,20 @@ export default function PokemonPage() {
                 <div className="mt-4">
                   <strong>Types:</strong>
                   <div className="flex gap-2 mt-2">
-                    {pokemon.types.map((type: string) => (
-                      <span
-                        key={type}
-                        className={`${
-                          statColors[type.toLowerCase()]
-                        } px-3 py-1 rounded-full text-white text-sm`}
-                      >
-                        {type}
-                      </span>
-                    ))}
+                    {pokemon?.types?.map(
+                      (typeObj, index) =>
+                        typeObj?.type?.name && (
+                          <span
+                            key={index}
+                            className={`${
+                              statColors[typeObj.type.name.toLowerCase()] ||
+                              "bg-gray-400"
+                            } px-3 py-1 rounded-full text-white text-sm`}
+                          >
+                            {typeObj.type.name}
+                          </span>
+                        )
+                    )}
                   </div>
                 </div>
               </div>
@@ -214,20 +232,27 @@ export default function PokemonPage() {
               <div className="bg-gray-800 rounded-xl p-6">
                 <h2 className="text-2xl font-semibold mb-4">Stats</h2>
                 <div className="space-y-4">
-                  {pokemon.stats.map((stat: any) => (
-                    <div key={stat.name}>
-                      <div className="flex justify-between mb-1">
-                        <span className="capitalize">{stat.name}</span>
-                        <span>{stat.value}</span>
-                      </div>
-                      <div className="w-full bg-gray-700 rounded-full h-2">
-                        <div
-                          className={`${typeClass} h-2 rounded-full transition-all duration-500`}
-                          style={{ width: `${(stat.value / 255) * 100}%` }}
-                        />
-                      </div>
-                    </div>
-                  ))}
+                  {pokemon?.stats?.map(
+                    (statObj, index) =>
+                      statObj?.stat?.name && (
+                        <div key={index}>
+                          <div className="flex justify-between mb-1">
+                            <span className="capitalize">
+                              {statObj.stat.name}
+                            </span>
+                            <span>{statObj.base_stat}</span>
+                          </div>
+                          <div className="w-full bg-gray-700 rounded-full h-2">
+                            <div
+                              className={`${typeClass} h-2 rounded-full transition-all duration-500`}
+                              style={{
+                                width: `${(statObj.base_stat / 255) * 100}%`,
+                              }}
+                            />
+                          </div>
+                        </div>
+                      )
+                  )}
                 </div>
               </div>
             </div>

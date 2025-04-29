@@ -105,19 +105,8 @@ const HomePage = () => {
                 className="relative group cursor-pointer transition-transform hover:scale-105"
               >
                 <PokemonCard name={pokemon.name} url={pokemon.url} />
-                <button
-                  onClick={(e) => handleLikeClick(e, pokemon.name)}
-                  className="absolute top-2 right-2 p-1 rounded-full hover:bg-gray-800 transition-colors flex items-center gap-1 bg-gray-900 bg-opacity-70"
-                >
-                  <FiHeart
-                    className={`w-5 h-5 ${
-                      likedMap[pokemon.name]
-                        ? "fill-red-500 stroke-red-500"
-                        : "stroke-gray-400"
-                    }`}
-                  />
-                  <span className="text-xs text-white">{likesMap[pokemon.name] || 0}</span>
-                </button>
+                
+                  
               </div>
             ))}
           </div>

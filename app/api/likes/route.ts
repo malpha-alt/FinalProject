@@ -1,50 +1,67 @@
 // app/api/likes/route.ts
-import { NextRequest } from "next/server";
-import getMongoClient from "@/lib/mongodb";
+import { NextResponse } from 'next/server';
+import { connectToDB } from '@/lib/mongodb';
 
-const collectionName = "likes";
+export async function GET(request: Request) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const name = searchParams.get('name');
+    
+    if (!name) {
+      return NextResponse.json({ error: 'Name parameter is required' }, { status: 400 });
+    }
 
-export async function GET(req: NextRequest) {
-  const { searchParams } = new URL(req.url);
-  const name = searchParams.get("name");
-  if (!name) return new Response("Missing name", { status: 400 });
-
-  const db = await getMongoClient();
-  const collection = db.db().collection(collectionName);
-  const pokemon = await collection.findOne({ name });
-  const likes = pokemon ? pokemon.likes : 0;
-
-  return Response.json({ likes });
+    const db = await connectToDB();
+    const likes = await db.collection('likes').findOne({ name });
+    
+    return NextResponse.json({ likes: likes?.count || 0 });
+  } catch (error) {
+    console.error('Error fetching likes:', error);
+    return NextResponse.json({ error: 'Failed to fetch likes' }, { status: 500 });
+  }
 }
 
-export async function POST(req: NextRequest) {
-  const { name } = await req.json();
-  if (!name) return new Response("Missing name", { status: 400 });
+export async function POST(request: Request) {
+  try {
+    const { name } = await request.json();
+    
+    if (!name) {
+      return NextResponse.json({ error: 'Name is required' }, { status: 400 });
+    }
 
-  const db = await getMongoClient();
-  const collection = db.db().collection(collectionName);
-  const result = await collection.findOneAndUpdate(
-    { name },
-    { $inc: { likes: 1 } },
-    { upsert: true, returnDocument: "after" }
-  );
-
-  const updatedLikes = result?.value?.likes || 1;
-  return Response.json({ likes: updatedLikes });
+    const db = await connectToDB();
+    const result = await db.collection('likes').updateOne(
+      { name },
+      { $inc: { count: 1 } },
+      { upsert: true }
+    );
+    
+    const updatedDoc = await db.collection('likes').findOne({ name });
+    return NextResponse.json({ likes: updatedDoc?.count || 1 });
+  } catch (error) {
+    console.error('Error updating likes:', error);
+    return NextResponse.json({ error: 'Failed to update likes' }, { status: 500 });
+  }
 }
 
-export async function DELETE(req: NextRequest) {
-  const { name } = await req.json();
-  if (!name) return new Response("Missing name", { status: 400 });
+export async function DELETE(request: Request) {
+  try {
+    const { name } = await request.json();
+    
+    if (!name) {
+      return NextResponse.json({ error: 'Name is required' }, { status: 400 });
+    }
 
-  const db = await getMongoClient();
-  const collection = db.db().collection(collectionName);
-  const result = await collection.findOneAndUpdate(
-    { name },
-    { $inc: { likes: -1 } },
-    { returnDocument: "after" }
-  );
-
-  const updatedLikes = result?.value?.likes ?? 0;
-  return Response.json({ likes: Math.max(updatedLikes, 0) }); // never negative
+    const db = await connectToDB();
+    const result = await db.collection('likes').updateOne(
+      { name },
+      { $inc: { count: -1 } }
+    );
+    
+    const updatedDoc = await db.collection('likes').findOne({ name });
+    return NextResponse.json({ likes: updatedDoc?.count || 0 });
+  } catch (error) {
+    console.error('Error updating likes:', error);
+    return NextResponse.json({ error: 'Failed to update likes' }, { status: 500 });
+  }
 }
