@@ -5,8 +5,20 @@ import { FiHeart } from "react-icons/fi";
 import { fetchPokemonDetails } from "../../api/services/pokemonApi";
 import Image from "next/image";
 import { Pokemon } from "@/types";
+/**
+ * [pokemon] Page Component
+ * Created by Julian Shyu
+ *
+ * Pokemon Display Page
+ *  - Fetch from MongoDB and verify the likes of the pokemon
+ *  - Allows you to like the pokemon that sends back to MongoDB
+ *  - Fetch stats from Pokemon API to fill out pokemon stats
+ *
+ *
+ * Styled using Tailwind CSS and responsive.
+ */
 
-// Updated color scheme for dark mode
+// statColors for stat bar colors of pokemon depending on typing
 const statColors: { [key: string]: string } = {
   fire: "bg-red-600",
   water: "bg-blue-600",
@@ -27,7 +39,7 @@ const statColors: { [key: string]: string } = {
   dark: "bg-neutral-700",
   ice: "bg-cyan-600",
 };
-
+//Text color depending on pokemon type
 const textColors: { [key: string]: string } = {
   fire: "text-red-400",
   water: "text-blue-400",
@@ -55,7 +67,7 @@ export default function PokemonPage() {
   console.log("params", params);
 
  
-
+//Declare variables
   const [pokemon, setPokemon] = useState<Pokemon | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -78,7 +90,8 @@ export default function PokemonPage() {
     fetchLikes();
   }, [name]);
   /**
-   * HandleLikeClick by Matheus alpha U63492196
+   * HandleLikeClick gets the likes from MONGODB and throws error if false
+   *
    */
 
   const handleLikeClick = async (e: React.MouseEvent) => {
@@ -98,6 +111,7 @@ export default function PokemonPage() {
       console.error("Error updating likes:", error);
     }
   };
+  //Fetches pokemon data from pokemon api
 
   useEffect(() => {
     async function loadPokemon() {
@@ -149,6 +163,7 @@ export default function PokemonPage() {
     );
   }
 
+  //Variables for primary/secondary typing of pokemon
   const primaryType =
     pokemon?.types?.[0]?.type?.name?.toLowerCase?.() ?? "normal";
   const secondaryType = pokemon?.types?.[1]?.type?.name?.toLowerCase?.();
@@ -179,7 +194,7 @@ export default function PokemonPage() {
 
         <div className="p-6 bg-gray-900">
           <div className="flex flex-col md:flex-row gap-8">
-            {/* Image Section */}
+            {/* Pokemon Image Section */}
             <div className="md:w-1/3">
               <div className="bg-gray-800 rounded-xl p-6">
                 {pokemon?.sprites?.front_default && (
@@ -233,7 +248,7 @@ export default function PokemonPage() {
                 </div>
               </div>
 
-              {/* Stats Section */}
+              {/* Stats Section with stat bars (255 is max pokemon stat)*/}
               <div className="bg-gray-800 rounded-xl p-6">
                 <h2 className="text-2xl font-semibold mb-4">Stats</h2>
                 <div className="space-y-4">
