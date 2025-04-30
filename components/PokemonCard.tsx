@@ -40,6 +40,9 @@ const PokemonCard: React.FC<PokemonCardProps> = ({ name, url }) => {
     fetchLikes();
   }, [name]);
 
+  /**
+   * handleLikeClick function by Matheus alpha U63492196
+   */
   const handleLikeClick = async (e: React.MouseEvent) => {
     e.preventDefault(); // Prevent navigation when clicking the like button
     try {

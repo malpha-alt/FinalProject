@@ -77,8 +77,10 @@ export default function PokemonPage() {
     }
     fetchLikes();
   }, [name]);
+  /**
+   * HandleLikeClick by Matheus alpha U63492196
+   */
 
-  // Handle like click - only adds likes
   const handleLikeClick = async (e: React.MouseEvent) => {
     e.preventDefault();
     try {

@@ -1,3 +1,5 @@
+//by matheus alpha U63492196
+
 export type Pokemon = {
     id: number;
     name: string;

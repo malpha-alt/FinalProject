@@ -1,10 +1,12 @@
+//by matheus alpha U63492196
+
 import { NextResponse } from "next/server";
-import { connectToDB } from "@/lib/mongodb";
+import clientPromise from "@/lib/mongodb";
 
 export async function GET() {
   try {
-    const db = await connectToDB();
-    const likes = await db.collection("likes").find({}).toArray();
+    const db = await clientPromise;
+    const likes = await db.db("pokemon").collection("likes").find({}).toArray();
 
     // Convert array to object with pokemon names as keys
     const likesObject = likes.reduce((acc: { [key: string]: number }, curr) => {
